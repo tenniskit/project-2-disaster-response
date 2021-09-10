@@ -1,9 +1,6 @@
 # Disaster Response Pipeline Project
 
-<p align="center">
-    <img src=![plot](./data/output.png) alt="logo" >
-  
-</p>
+![plot](./data/output.png) 
 
 ### Table of Contents
 
