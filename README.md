@@ -5,10 +5,11 @@
 
 1. [Introduction](#introduction)
 2. [What's included](#included)
-3. [File Descriptions](#files)
+3. [File Descriptions](#files_desc)
 3. [Installation](#installation)
 4. [Instructions](#instructions)
-5. [Licensing, Authors, and Acknowledgements](#licensing)
+5. [Usage](#usage)
+6. [Licensing, Authors, and Acknowledgements](#licensing)
 
 
 ## Introduction <a name="introduction"></a>
@@ -41,7 +42,7 @@ The project aims at providing a web application called "Disasters" for end-users
 
 
 
-## File Descriptions <a name="files"></a>
+## File Descriptions <a name="files_desc"></a>
 
 1. data/disaster_categories.csv
     - Categories dataset from Figure Eight.
@@ -108,7 +109,7 @@ Python libraries used in the project:
         `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
 		![plot](./models/output.png) 
 
-		### Please note that ML pipeline takes time to train model. In a testing machine with Intel i7 CPU and 32GB ram, it took 2 hours to complete.
+		### Please note that ML pipeline takes time to train model. In a testing machine with Intel i7 CPU and 32GB ram, it took 1.5 hours to complete.
 		
 2. Run the following command in the app's directory to run your web app.
     `python run.py`
@@ -116,6 +117,17 @@ Python libraries used in the project:
 3. Go to http://localhost:3001/
 
    ![plot](./app/output.png) 
+
+
+### Usage <a name="usage"></a>
+1. Enter the custom message in the textbox. Then hit "Classify Message".
+
+   ![plot](./usage_1.png) 
+
+2. It will show all categories that the custom message belongs to with green highlighted.
+
+   ![plot](./usage_2.png) 
+
 
 
 ## Licensing, Authors, Acknowledgements<a name="licensing"></a>
