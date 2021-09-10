@@ -2,8 +2,11 @@ import json
 import plotly
 import pandas as pd
 
-from nltk.stem import WordNetLemmatizer
+import re
+import nltk
+nltk.download(['punkt', 'wordnet'])
 from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 
 from flask import Flask
 from flask import render_template, request, jsonify
@@ -23,12 +26,52 @@ import share_lib
 
 app = Flask(__name__)
 
-"""
-(This function has been moved into share library "share_lib".)
+
+def extract_category_names(df):
+    """Extracts multiple category names of target variables from input dataframe.
+
+    Args:
+    df: Input dataframe containing target variables
+
+    Returns:
+    Target variable (column) names in a string array
+    """
+
+    # Define the filtering columns not belong to target variable column names
+    filter_cols = ['index', 'id', 'message', 'original', 'genre']
+    
+    # Find all columns which do not belong to the filtering columns
+    category_names = []
+    for col in df.columns.values:
+        if col not in filter_cols:
+            category_names.append(str(col))
+            
+    return category_names
+
+
 def tokenize(text):
-    ...
-    ...
-"""
+    """Text processing functions including normalization, word tokenization, lemmatization.
+
+    Args:
+    text : A sentence of text.
+
+    Returns:
+    Tokenized words in a string array.
+    """
+    
+    # Punctuation removal
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text)
+    
+    # Word tokenization
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+
+    clean_tokens = []
+    for tok in tokens:
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip() #Case normalization and lemmatization
+        clean_tokens.append(clean_tok)
+
+    return clean_tokens
 
 
 # load data
@@ -48,7 +91,7 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
-    category_names = share_lib.extract_category_names(df)
+    category_names = extract_category_names(df)
     category_counts = df[ category_names ].sum()
 
     # create visuals

@@ -4,6 +4,12 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 
+import re
+import nltk
+nltk.download(['punkt', 'wordnet'])
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 
@@ -21,10 +27,53 @@ from sklearn.metrics import recall_score
 import pickle
 import sys
 
-# Import a custom library from specific path
-sys.path.append('../share') 
-import share_lib
 
+def extract_category_names(df):
+    """Extracts multiple category names of target variables from input dataframe.
+
+    Args:
+    df: Input dataframe containing target variables
+
+    Returns:
+    Target variable (column) names in a string array
+    """
+
+    # Define the filtering columns not belong to target variable column names
+    filter_cols = ['index', 'id', 'message', 'original', 'genre']
+    
+    # Find all columns which do not belong to the filtering columns
+    category_names = []
+    for col in df.columns.values:
+        if col not in filter_cols:
+            category_names.append(str(col))
+            
+    return category_names
+
+
+def tokenize(text):
+    """Text processing functions including normalization, word tokenization, lemmatization.
+
+    Args:
+    text : A sentence of text.
+
+    Returns:
+    Tokenized words in a string array.
+    """
+    
+    # Punctuation removal
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text)
+    
+    # Word tokenization
+    tokens = word_tokenize(text)
+    lemmatizer = WordNetLemmatizer()
+
+    clean_tokens = []
+    for tok in tokens:
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip() #Case normalization and lemmatization
+        clean_tokens.append(clean_tok)
+
+    return clean_tokens
+    
 
 def load_data(database_filepath):
     """Load the dataframe from SQLite database.
@@ -43,7 +92,7 @@ def load_data(database_filepath):
     df = pd.read_sql_table('Message', engine)  
     
     # Extract target variable names from the loaded data
-    category_names = share_lib.extract_category_names(df)
+    category_names = extract_category_names(df)
 
     # Extract independent variable
     X = df["message"].values
@@ -68,13 +117,13 @@ def build_model():
     """
     
     pipeline = Pipeline([
-        ('vect', CountVectorizer(tokenizer=share_lib.tokenize)),
+        ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(RandomForestClassifier()))
     ])
     
     parameters = {
-        'clf__estimator__n_estimators': [95, 100] # Lowers the range of hyperparameters in order to prevent it from taking too long to run.
+        'clf__estimator__n_estimators': [99, 100] # Lowers the range of hyperparameters in order to prevent it from taking too long to run.
     }
 
     return GridSearchCV(pipeline, param_grid=parameters)
